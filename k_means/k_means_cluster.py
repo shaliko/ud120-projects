@@ -44,6 +44,27 @@ data_dict = pickle.load( open("../final_project/final_project_dataset.pkl", "r")
 ### there's an outlier--remove it! 
 data_dict.pop("TOTAL", 0)
 
+exercised_stock_options = []
+for key in data_dict.keys():
+    exercised_stock_options += [data_dict[key]["from_messages"]]
+
+exercised_stock_options.sort()
+print exercised_stock_options
+
+# #salary
+# min = 477
+# max = 1111258
+# value = 200000
+# rescaled_salary_value = (value - min) / float(max - min)
+# print "rescaled_salary_value => ", rescaled_salary_value
+
+# # exercised_stock_options
+# min = 3285
+# max = 34348384
+# value = 1000000
+# rescaled_exercised_stock_options_value = (value - min) / float(max - min)
+# print "rescaled_exercised_stock_options_value => ", rescaled_exercised_stock_options_value
+
 
 ### the input features we want to use 
 ### can be any key in the person-level dictionary (salary, director_fees, etc.) 
@@ -69,6 +90,17 @@ from sklearn.cluster import KMeans
 features_list = ["poi", feature_1, feature_2]
 data2 = featureFormat(data_dict, features_list )
 poi, finance_features = targetFeatureSplit( data2 )
+
+#
+from sklearn import preprocessing
+min_max_scaler = preprocessing.MinMaxScaler()
+
+print finance_features
+
+finance_features = min_max_scaler.fit_transform(finance_features)
+
+print finance_features
+#
 clf = KMeans(n_clusters=2)
 pred = clf.fit_predict( finance_features )
 Draw(pred, finance_features, poi, name="clusters_before_scaling.pdf", f1_name=feature_1, f2_name=feature_2)
@@ -81,8 +113,3 @@ try:
     Draw(pred, finance_features, poi, mark_poi=False, name="clusters.pdf", f1_name=feature_1, f2_name=feature_2)
 except NameError:
     print "no predictions object named pred found, no clusters to plot"
-
-
-
-
-
